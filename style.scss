@@ -1,0 +1,23 @@
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+table {
+	tr {
+		vertical-align: middle;
+	}
+}
+
+.single_product {
+	img {
+		width: 250px;
+		height: 250px;
+		object-fit: cover;
+		border-radius: 50%;
+		display: block;
+		margin: 0 auto;
+		border: 5px solid #ccc;
+	}
+}
