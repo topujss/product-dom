@@ -2,7 +2,7 @@
  * Alert function
  */
 
-const alertFunction = (message, type = 'danger') => {
+ const alertFunction = (message, type = 'danger') => {
 	return `<p class="alert alert-${type} d-flex justify-content-between">${message}<button data-bs-dismiss="alert" class="btn-close btn-sm"></button></p>`;
 };
 
@@ -69,7 +69,7 @@ const clock = () => {
 		let min = time.getMinutes();
 		let sec = time.getSeconds();
 
-		// function for 0 before time
+		// function for
 		const zero = (time) => {
 			return (time = time < 10 ? '0' + time : time);
 		};
