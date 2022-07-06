@@ -60,22 +60,31 @@ const updataLsData = (key, array) => {
  */
 const clock = () => {
 	const display = document.getElementById('time');
-	const time = new Date();
-	let hr = time.getHours();
-	let min = time.getMinutes();
-	let sec = time.getSeconds();
 
-	if (sec >= 0 && sec <= 9) {
-		'0' + sec;
-	}
+	// interval set for Clock
+	setInterval(() => {
+		// store clock in time from date constructor
+		const time = new Date();
+		let hr = time.getHours();
+		let min = time.getMinutes();
+		let sec = time.getSeconds();
 
-	return (display.innerHTML = `<h4 class=" mt-2 mb-0">${hr}:${min}:${sec}</h4>`);
+		// function for 0 before time
+		const zero = (time) => {
+			return (time = time < 10 ? '0' + time : time);
+		};
+
+		return (display.innerHTML = `<h4 class=" mt-2 mb-0"> ${zero(hr)}:${zero(min)}:${zero(
+			sec
+		)}</h4>`);
+	}, 1000);
+	clearInterval();
 };
 
 /**
  * value set LS
  */
-const createLsData = (key, value) => {
+function createLsData(key, value) {
 	// init empty data
 	let data = [];
 
@@ -89,4 +98,4 @@ const createLsData = (key, value) => {
 
 	// converting value by json.stringify
 	localStorage.setItem(key, JSON.stringify(data));
-};
+}
