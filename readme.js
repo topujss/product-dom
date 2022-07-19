@@ -1,94 +1,217 @@
-// MERN 6-29-22 https://www.youtube.com/watch?v=Mz_10hA1T1k  1:16:05 / 1:45:26 << start from this.
+// MERN 6-15-22 http://www.youtube.com/watch?v=hJyPVk0sWqg  << start from this.
+// MERN p2 6-19-22 https://www.youtube.com/watch?v=uuMLr1oFkZ4
+// MERN p2 6-22-22 http://www.youtube.com/watch?v=5C7-vIobnjE
 
-// Learned:
+// Learned: array.find, .filter, .some, .findIndex, small shop project
 
-/** Dom FB timeline
- *
+/** Dom small shop project
+ * array.find(item=>{return item}) /> return single value.
+ * array.filter /> return multiple value.
+ * array.some /> show if the item is there or not.
+ * array.findIndex(item=>{return item}) /> show the index number of that item.
  */
+// real clock
+clock();
 
-// get elements
-const main_form = document.getElementById('post-add-me');
+// Get getElements
+const form = document.getElementById('new-product');
 const msg = document.querySelector('.msg');
-const all_post = document.querySelector('.all-post');
+const ProductList = document.getElementById('product-list');
 
-// get all post function
-const getAllPost = () => {
-	let post = readLsData('fb_post');
+const singleProduct = document.querySelector('.single_product');
+const editProduct = document.getElementById('edit-product');
+
+// get all products
+const getProducts = () => {
+	// get all lS data
+	const data = readLsData('product');
+
+	// init list
 	let list = '';
 
-	if (!post) {
-		all_post.innerHTML = `<div class="card shadow-sm text-center"><div class="card-body">No post found</div></div>`;
-		return false;
+	// Check Ls Data exists
+	if (data.length == 0 || !data) {
+		list = `
+      <tr>
+        <td colspan="7" class="text-center text-danger">No products to show, add from "add product"</td>
+      </tr>
+    `;
 	}
 
-	post.reverse().map((data) => {
+	//Show all data to list
+	if (data && data.length > 0) {
+		let finalAmmount = 0;
+
+		//loop for data
+		data.map((item, index) => {
+			finalAmmount += item.price * item.quantity;
+			list += `
+      <tr>
+        <td scope="row"><strong>${index + 1}</strong></td>
+        <td>
+          <img style="width: 60px;height:60px; object-fit: cover;border-radius: 0.5rem; " src="${
+						item.photo
+					}" alt="" />
+        </td>
+        <td>${item.name}</td>
+        <td>$${item.price}</td>
+        <td>${item.quantity}</td>
+        <td>$${item.price * item.quantity}</td>
+        <td>
+          <a href="#single_modal" data-bs-toggle="modal" data_index="${index}" class="pen-eye btn btn-sm btn-primary">
+						<i class="bi bi-eye"></i>
+					</a>
+          <a href="#edit_modal" data-bs-toggle="modal" data_index="${index}" class="pen-edit btn btn-sm btn-warning">
+						<i class="bi bi-pen"></i>
+					</a>
+          <a href="#" class="pen-trash btn btn-sm btn-danger" data_index="${index}">
+						<i class="bi bi-trash2"></i>
+					</a>
+        </td>
+      </tr>
+      `;
+		});
+
 		list += `
-	  <div class="fb-timeline my-4">
-	    <div class="card shadow-sm overflow-hidden rounded-3">
-	      <div class="card-body p-2">
-	        <div class="post-auth">
-	          <div class="u-info">
-	            <img src="${data.aphoto}" alt="" />
-	            <div class="details">
-	              <span>${data.aname}</span>
-	              <small>
-	                Just Now
-	                <i class="bi bi-dot"></i>
-	                <i class="bi bi-globe"></i>
-	              </small>
-	            </div>
-	          </div>
-	          <div class="dropdown">
-	            <a href="#" id="dropdownMenuLink" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></a>
-	            <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-	              <li><a class="dropdown-item" href="#">edit</a></li>
-	              <li><a class="dropdown-item w-100" href="#">Delete</a></li>
-	            </ul>
-	          </div>
-	        </div>
-	        <div class="post-content my-2">
-	          <p>${data.pdesc}</p>
-	        </div>
-	        <div class="post-timeline"></div>
-	      </div>
-				${data.pphoto ? `<img src="${data.pphoto}" class="w-100" alt="" />` : ''}
-	      <div class="post-react-area d-flex">
-	        <div class="react-box">
-	          <i class="bi bi-hand-thumbs-up"></i>
-	          <span>like</span>
-	        </div>
-	        <div class="react-box">
-	          <i class="bi bi-chat-square"></i>
-	          <span>comment</span>
-	        </div>
-	        <div class="react-box">
-	          <i class="bi bi-box-arrow-up-right"></i>
-	          <span>share</span>
-	        </div>
-	      </div>
-	    </div>
-	  </div>`;
-	});
+      <tr>
+        <td colspan="6" class="text-end text-success" style="padding-right:2rem">Final - $${finalAmmount}</td>
+        <td></td>
+      </tr>
+    `;
+	}
 
-	all_post.innerHTML = list;
+	ProductList.innerHTML = list;
 };
-getAllPost();
+getProducts();
 
-main_form.onsubmit = (e) => {
+// submit form
+form.onsubmit = (e) => {
 	e.preventDefault();
 
-	//Form Data get by Object
-	const form_data = new FormData(e.target);
-	const data = Object.fromEntries(form_data.entries());
-	const { aname, aphoto, pdesc, pphoto } = Object.fromEntries(form_data.entries());
+	// get form data from formData object
+	let formData = new FormData(e.target);
 
-	// validation
-	if (!aname || !aphoto || !pdesc) {
-		msg.innerHTML = alertFunction('Fields cant be empty');
+	// get product data from array
+	let productData = Object.fromEntries(formData.entries());
+
+	// send form entries by destructuring variable
+	let { name, price, quantity, photo } = Object.fromEntries(formData.entries());
+
+	// validate form
+	if (!name || !price || !quantity || !photo) {
+		msg.innerHTML = alertFunction('All fields are required!');
 	} else {
-		createLsData('fb_post', data);
-		e.target.reset();
-		getAllPost();
+		// passing product value in product key to local Storage
+		createLsData('product', productData);
+
+		msg.innerHTML = alertFunction('You are good', 'success');
+		// reset form - both work same
+		// e.target.reset();
+		form.reset();
+		// By calling this function add product instantly
+		getProducts();
 	}
-	console.log(main_form);
+};
+
+// View single product
+ProductList.onclick = (e) => {
+	e.preventDefault();
+
+	if (e.target.classList.contains('pen-eye')) {
+		//Get single data index
+		let index = e.target.getAttribute('data_index');
+		let data = readLsData('product');
+
+		// destructuring data key
+		const { name, price, photo, quantity } = data[index];
+
+		// send data to modal
+		singleProduct.innerHTML = `
+      <img src="${photo}" class="shadow " alt="" />
+      <h2>${name}</h2>
+      <h5 class="text-info">Price : ${price}</h5>
+      <p>Quantity: ${quantity}</p>
+    `;
+	}
+
+	// Edit single product
+	if (e.target.classList.contains('pen-edit')) {
+		// find index id from product
+		let index = e.target.getAttribute('data_index');
+
+		// get product
+		let data = readLsData('product');
+
+		// get all the key from data index
+		const { name, price, photo, quantity } = data[index];
+
+		//set form data
+		editProduct.innerHTML = `
+    <div class="my-2">
+      <label>Product name</label>
+      <input name="name" type="text" value="${name}" class="form-control" />
+    </div>
+    <div class="my-2">
+      <label>Product Price</label>
+      <input name="price" type="number" value="${price}" class="form-control" />
+    </div>
+    <div class="my-2">
+      <label>Product Quantity</label>
+      <input type="number" name="quantity"  value="${quantity}" class="form-control" />
+    </div>
+    <div class="my-2 d-none">
+      <label>index</label>
+      <input type="hidden" name="index"  value="${index}" class="form-control" />
+    </div>
+    <div class="my-2">
+      <img src="${photo}"class="w-75 m-auto d-block" alt="">
+    </div>
+    <div class="my-2">
+      <label>Product photo</label>
+      <input name="photo" type="url" value="${photo}" class="form-control" />
+    </div>
+    <div class="my-3">
+      <input type="submit" value="Update now" class="py-2 btn btn-outline-info w-100" />
+    </div>
+    `;
+	}
+	// delete/remove single product
+	if (e.target.classList.contains('pen-trash')) {
+		let conf = confirm('Are you sure?');
+
+		if (conf) {
+			//Find index id for specific product when click
+			let index = e.target.getAttribute('data_index');
+
+			// get all data from product array
+			let data = readLsData('product');
+
+			// from product array splice/delete 1 data by index
+			data.splice(index, 1);
+
+			// update ls data after finish changes
+			updataLsData('product', data);
+
+			// Now show updated data
+			getProducts();
+		}
+	}
+};
+
+editProduct.onsubmit = (e) => {
+	e.preventDefault();
+
+	const formData = new FormData(e.target);
+	const { name, photo, quantity, price, index } = Object.fromEntries(formData.entries());
+
+	// get all ls data
+	let allData = readLsData('product');
+
+	allData[index] = { name, price, quantity, photo };
+
+	// updata ls data
+	updataLsData('product', allData);
+
+	// calling main function
+	getProducts();
 };
